@@ -41,8 +41,19 @@ function s:LinuxConfigure()
                 break
             endif
         endfor
-    else
-        let apply_style = 1
+    endif
+
+    if !apply_style
+        " Check if it looks like the file we're editing is in a kernel tree.
+        " Ignores files that aren't underneath the cwd.
+        let dir = fnamemodify(expand('%:p'), ':p:h')
+        while dir =~ '^' . getcwd()
+            if !empty(dir . '/init') && !empty(dir . '/kernel') && !empty(dir . '/include/linux') && !empty(dir . '/mm') && !empty(dir . '/fs')
+                let apply_style = 1
+                break
+            endif
+            let dir = fnamemodify(dir, ':p:h')
+        endwhile
     endif
 
     if apply_style
